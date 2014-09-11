@@ -26,6 +26,10 @@ class DashboardCodaoneDbUpdaterSettingsController extends Controller {
         $html = Loader::helper('html');
         $this->addHeaderItem($html->css('select2.css', 'codaone_db_updater'));
         $this->addHeaderItem($html->javascript('select2.min.js', 'codaone_db_updater'));
+		if(!is_writable($this->xmlFile)) {
+			$error = "db.xml file is not writable! Please change it!";
+			$this->set("error", $error);
+		}
     }
 
     public function view() {
@@ -43,7 +47,7 @@ class DashboardCodaoneDbUpdaterSettingsController extends Controller {
 	public function getTables() {
 		$db = Loader::db();
 		$tables = $db->GetCol("SHOW TABLES");
-		$fileCont = file_get_contents($this->xmlFile);
+		$fileCont = @file_get_contents($this->xmlFile);
 		preg_match_all("/table name=\"(.*?)\"/", $fileCont, $match);
 		if(count($match[1])) {
 			foreach($match[1] as $tab) {
@@ -59,17 +63,19 @@ class DashboardCodaoneDbUpdaterSettingsController extends Controller {
 	}
 
 	public function save() {
-		$tables = $_REQUEST["tables"];//, array());
-		if(count($tables)) {
-			$xmlStr = '<?xml version="1.0"?>' . "\n"
-				. '<schema version="' . $this->schemaVersion . '">' . "\n";
-			foreach($tables as $t) {
-				$xmlStr .= $this->extractSchema($t, false);
+		if(is_writable($this->xmlFile)) {
+			$tables = $_REQUEST["tables"];//, array());
+			if(count($tables)) {
+				$xmlStr = '<?xml version="1.0"?>' . "\n"
+					. '<schema version="' . $this->schemaVersion . '">' . "\n";
+				foreach($tables as $t) {
+					$xmlStr .= $this->extractSchema($t, false);
+				}
+				$xmlStr .= "</schema>\n";
+				@file_put_contents($this->xmlFile, $xmlStr);
 			}
-			$xmlStr .= "</schema>\n";
-			file_put_contents($this->xmlFile, $xmlStr);
 		}
-		$this->view();
+		$this->redirect("/dashboard/codaone_db_updater/settings/");
 	}
 
     private function extractSchema($prefix,  $incSchemaTag = true) {
