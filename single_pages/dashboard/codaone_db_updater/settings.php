@@ -40,7 +40,7 @@ echo  $dh->getDashboardPaneHeaderWrapper(t('Db.xml updater'));
 //        ?>
 <!--    </div>-->
 	<div class="input">
-		<?php print $ih->submit(t('Save and update'), 'ccm-user-form', 'left', 'primary'); ?>
+		<?php print $ih->submit(t('Update db.xml'), 'ccm-user-form', 'left', 'primary'); ?>
 		<?php //print $ih->button(t('Update db.xml'), $this->url('/dashboard/codaone_db_updater/settings/update/'), 'right') ?>
 	</div>
 </form>

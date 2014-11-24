@@ -10,7 +10,7 @@ class CodaoneDbUpdaterPackage extends Package {
 
     protected $pkgHandle = 'codaone_db_updater';
     protected $appVersionRequired = '5.3.3.1';
-    protected $pkgVersion = '0.1';
+    protected $pkgVersion = '0.0.3';
     protected $singlePages = array(
         "/dashboard/codaone_db_updater" 			=> "Db updater",
         "/dashboard/codaone_db_updater/settings" 	=> "Settings",

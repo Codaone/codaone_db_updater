@@ -123,9 +123,9 @@ class DashboardCodaoneDbUpdaterSettingsController extends Controller {
 
                         if( isset($details->has_default) && $details->has_default ) {
                             if($details->default_value == "CURRENT_TIMESTAMP") {
-                                $content[] = '<DEFAULT value="' . htmlentities( $details->default_value ) . '"/>';
-                            } else {
                                 $content[] = '<DEFTIMESTAMP/>';
+                            } else {
+                                $content[] = '<DEFAULT value="' . htmlentities( $details->default_value ) . '"/>';
                             }
                         }
 
@@ -144,6 +144,9 @@ class DashboardCodaoneDbUpdaterSettingsController extends Controller {
                         if($type == "N") {
                             $type = "decimal(10,5)";
                         }
+						if($details->type == "longtext") {
+							$type = "XL";
+						}
 
                         $schema .= str_repeat( $indent, 2 ) . '<field name="' . htmlentities( $details->name ) . '" type="' . $type . '"' . $extra;
 
