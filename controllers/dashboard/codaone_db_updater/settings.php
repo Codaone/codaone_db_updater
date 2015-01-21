@@ -62,6 +62,10 @@ class DashboardCodaoneDbUpdaterSettingsController extends Controller {
 		return $retTables;
 	}
 
+    public function getRow($sql) {
+        return $this->db->GetRow($sql);
+    }
+
 	public function save() {
 		if(is_writable($this->xmlFile)) {
 			$tables = $_REQUEST["tables"];//, array());
@@ -102,9 +106,10 @@ class DashboardCodaoneDbUpdaterSettingsController extends Controller {
                 $schema .= $indent . '<table name="' . htmlentities( $table ) . '">' . "\n";
 
                 // grab details from database
-                $rs = $this->db->Execute( 'SELECT * FROM ' . $table . ' WHERE -1' );
+                $rs = $this->db->Execute( 'SELECT * FROM `' . $table . '` WHERE -1' );
                 $fields = $this->db->MetaColumns( $table );
                 $indexes = $this->db->MetaIndexes( $table );
+                $foreign = ADODB_mysql::MetaForeignKeys( $table );
 
                 if( is_array( $fields ) ) {
                     foreach( $fields as $details ) {
@@ -147,6 +152,17 @@ class DashboardCodaoneDbUpdaterSettingsController extends Controller {
 						if($details->type == "longtext") {
 							$type = "XL";
 						}
+
+                        if(is_array($foreign)) {
+                            foreach ($foreign as $toTable => $fields) {
+                                foreach($fields as $fg) {
+                                    list($field, $refField) = explode("=", $fg);
+                                    if($field == $details->name) {
+                                        $content[] = "<constraint>, foreign key ($field) references $toTable($refField)</constraint>";
+                                    }
+                                }
+                            }
+                        }
 
                         $schema .= str_repeat( $indent, 2 ) . '<field name="' . htmlentities( $details->name ) . '" type="' . $type . '"' . $extra;
 
